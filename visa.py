@@ -54,8 +54,8 @@ hour = 60 * minute
 # Time between steps (interactions with forms)
 STEP_TIME = 0.5
 # Time between retries/checks for available dates (seconds)
-RETRY_TIME_L_BOUND = config['TIME'].getfloat('RETRY_TIME_L_BOUND')
-RETRY_TIME_U_BOUND = config['TIME'].getfloat('RETRY_TIME_U_BOUND')
+RETRY_TIME_L_BOUND = int(config['TIME'].getfloat('RETRY_TIME_L_BOUND'))
+RETRY_TIME_U_BOUND = int(config['TIME'].getfloat('RETRY_TIME_U_BOUND'))
 # Cooling down after WORK_LIMIT_TIME hours of work (Avoiding Ban)
 WORK_LIMIT_TIME = config['TIME'].getfloat('WORK_LIMIT_TIME')
 WORK_COOLDOWN_TIME = config['TIME'].getfloat('WORK_COOLDOWN_TIME')
@@ -183,9 +183,19 @@ def reschedule(date):
 
 def get_date():
     # Requesting to get the whole available dates
+    
     session = driver.get_cookie("_yatri_session")["value"]
+    # msg = f"session is {session}"
+    # print(msg)
+
     script = JS_SCRIPT % (str(DATE_URL), session)
+    # msgScript = f"script is {script}"
+    # print(msgScript)
+
     content = driver.execute_script(script)
+    # msgContent = f"content is {content}"
+    # print(msgContent)
+    
     return json.loads(content)
 
 def get_time(date):
@@ -253,8 +263,12 @@ if __name__ == "__main__":
             dates = get_date()
             if not dates:
                 # Ban Situation
-                msg = f"List is empty, Probabely banned!\n\tSleep for {BAN_COOLDOWN_TIME} hours!\n"
+                msg = f"List is empty, Probabely banned!\n\tSleep for {BAN_COOLDOWN_TIME} hours!\n"               
                 print(msg)
+
+                # msgdates = f"dates is {dates}"
+                # print(msgdates)
+
                 info_logger(LOG_FILE_NAME, msg)
                 send_notification("BAN", msg)
                 driver.get(SIGN_OUT_LINK)
@@ -269,15 +283,22 @@ if __name__ == "__main__":
                 print(msg)
                 info_logger(LOG_FILE_NAME, msg)
                 date = get_available_date(dates)
+                print("XXX")
                 if date:
                     # A good date to schedule for
                     END_MSG_TITLE, msg = reschedule(date)
                     break
+                # print({RETRY_TIME_L_BOUND})
+                # print({RETRY_TIME_U_BOUND})
+                # print(random.randint(RETRY_TIME_L_BOUND, RETRY_TIME_U_BOUND))
                 RETRY_WAIT_TIME = random.randint(RETRY_TIME_L_BOUND, RETRY_TIME_U_BOUND)
+                print({RETRY_WAIT_TIME})
                 t1 = time.time()
                 total_time = t1 - t0
+                
                 msg = "\nWorking Time:  ~ {:.2f} minutes".format(total_time/minute)
                 print(msg)
+
                 info_logger(LOG_FILE_NAME, msg)
                 if total_time > WORK_LIMIT_TIME * hour:
                     # Let program rest a little
@@ -294,7 +315,7 @@ if __name__ == "__main__":
             # Exception Occured
             msg = f"Break the loop after exception!\n"
             END_MSG_TITLE = "EXCEPTION"
-            break
+            break              
 
 print(msg)
 info_logger(LOG_FILE_NAME, msg)
