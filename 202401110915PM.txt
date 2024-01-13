@@ -1,0 +1,27 @@
+[Running] python -u "c:\Users\LZLZL\OneDrive\文档\GitHub\us_visa_scheduler\visa.py"
+	Click bounce:		Check!
+	Email:		Check!
+	Password:		Check!
+	Privacy:		Check!
+	Enter Panel:		Check!
+
+	login successful!
+
+------------------------------------------------------------
+Request count: 1, Log time: 2024-01-11 21:01:05.102245
+
+Available dates:
+2025-10-30, 2026-04-07, 2026-04-08, 2026-04-09, 2026-04-10, 2026-04-13, 2026-04-14, 2026-04-16, 2026-04-17, 2026-04-20, 2026-04-21, 2026-04-22, 2026-04-23, 2026-04-24, 2026-04-27, 2026-04-28, 2026-04-29, 2026-04-30, 
+get_available_date method is here!
+reschedule method is going to run!
+Got time successfully! 2025-10-30 07:45
+reschedule method step 1
+date is 2025-10-30, time is 07:45
+reschedule method step get
+reschedule method step headers
+Break the loop after exception!
+
+Sending notification!
+
+[Done] exited with code=0 in 20.052 seconds
+

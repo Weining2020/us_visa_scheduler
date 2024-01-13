@@ -156,14 +156,22 @@ def start_process():
 
 def reschedule(date):
     time = get_time(date)
+    print("reschedule method step 1")
+    print(f"date is {date}, time is {time}")
     driver.get(APPOINTMENT_URL)
+    print(f"APPOINTMENT_URL is {APPOINTMENT_URL}")
+  
+    print("reschedule method step get")
     headers = {
         "User-Agent": driver.execute_script("return navigator.userAgent;"),
         "Referer": APPOINTMENT_URL,
         "Cookie": "_yatri_session=" + driver.get_cookie("_yatri_session")["value"]
     }
+    print(f"headers is {headers}")
+    print("reschedule method step headers")
+    
     data = {
-        "utf8": driver.find_element(by=By.NAME, value='utf8').get_attribute('value'),
+        # "utf8": driver.find_element(by=By.NAME, value='utf8').get_attribute('value'),
         "authenticity_token": driver.find_element(by=By.NAME, value='authenticity_token').get_attribute('value'),
         "confirmed_limit_message": driver.find_element(by=By.NAME, value='confirmed_limit_message').get_attribute('value'),
         "use_consulate_appointment_capacity": driver.find_element(by=By.NAME, value='use_consulate_appointment_capacity').get_attribute('value'),
@@ -171,13 +179,45 @@ def reschedule(date):
         "appointments[consulate_appointment][date]": date,
         "appointments[consulate_appointment][time]": time,
     }
+    print(f"data is {data}")
+
+    # data = {}
+    # print(f"data is {data}")
+    # try:
+    #     data["utf8"] = driver.find_element(by=By.NAME, value='utf8').get_attribute('value')
+    #     print(f"data is {data}")
+        
+    #     data["authenticity_token"] = driver.find_element(by=By.NAME, value='authenticity_token').get_attribute('value')
+    #     print(f"data is {data}")
+        
+    #     data["confirmed_limit_message"] = driver.find_element(by=By.NAME, value='confirmed_limit_message').get_attribute('value')
+    #     print(f"data is {data}")
+        
+    #     data["use_consulate_appointment_capacity"] = driver.find_element(by=By.NAME, value='use_consulate_appointment_capacity').get_attribute('value')
+    #     print(f"data is {data}")
+    # except NoSuchElementException as e:
+    #     print("Error retrieving element:", e)
+    #     # 可以根据需要处理异常，比如设置默认值或者提前返回
+
+    # data["appointments[consulate_appointment][facility_id]"] = FACILITY_ID
+    # data["appointments[consulate_appointment][date]"] = date
+    # data["appointments[consulate_appointment][time]"] = time
+
+    # print(f"data is {data}")
+
+    print("reschedule method step data")
     r = requests.post(APPOINTMENT_URL, headers=headers, data=data)
+    print("reschedule method step 2")
+    print(f"{r.headers}")
     if(r.text.find('Successfully Scheduled') != -1):
+        print("reschedule method step find Y")
         title = "SUCCESS"
         msg = f"Rescheduled Successfully! {date} {time}"
     else:
+        print("reschedule method step find N")
         title = "FAIL"
         msg = f"Reschedule Failed!!! {date} {time}"
+    print("reschedule method step 3")
     return [title, msg]
 
 
@@ -226,6 +266,7 @@ def get_available_date(dates):
     
     PED = datetime.strptime(PRIOD_END, "%Y-%m-%d")
     PSD = datetime.strptime(PRIOD_START, "%Y-%m-%d")
+    print("get_available_date method is here!")
     for d in dates:
         date = d.get('date')
         if is_in_period(date, PSD, PED):
@@ -283,16 +324,16 @@ if __name__ == "__main__":
                 print(msg)
                 info_logger(LOG_FILE_NAME, msg)
                 date = get_available_date(dates)
-                print("XXX")
+
                 if date:
+                    print("reschedule method is going to run!")
                     # A good date to schedule for
                     END_MSG_TITLE, msg = reschedule(date)
+                    print("reschedule method is done!")
                     break
-                # print({RETRY_TIME_L_BOUND})
-                # print({RETRY_TIME_U_BOUND})
-                # print(random.randint(RETRY_TIME_L_BOUND, RETRY_TIME_U_BOUND))
+
                 RETRY_WAIT_TIME = random.randint(RETRY_TIME_L_BOUND, RETRY_TIME_U_BOUND)
-                print({RETRY_WAIT_TIME})
+
                 t1 = time.time()
                 total_time = t1 - t0
                 
